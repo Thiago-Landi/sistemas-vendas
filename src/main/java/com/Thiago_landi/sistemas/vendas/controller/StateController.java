@@ -1,8 +1,13 @@
 package com.Thiago_landi.sistemas.vendas.controller;
 
 import java.net.URI;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +34,30 @@ public class StateController implements GenericController {
 		// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id})
 		URI location = generateHeaderLocation(stateModel.getId());
 		return ResponseEntity.created(location).build();
+	}
+	
+	@GetMapping("{id}")
+	public ResponseEntity<StateDTO> findById(@PathVariable("id") String id){
+		var idState = UUID.fromString(id);
+		Optional<State> stateOptional = stateService.findById(idState);
+		if(stateOptional.isPresent()) {
+			State state = stateOptional.get();
+			StateDTO stateDto = new StateDTO(state.getName(), state.getAbbreviation());
+			
+			return ResponseEntity.ok(stateDto);
+		}
+		
+		return ResponseEntity.notFound().build();
+	}
+	
+	@DeleteMapping("{id}")
+	public ResponseEntity<Void> delete(@PathVariable("id") String id){
+		var idState = UUID.fromString(id);
+		Optional<State> state = stateService.findById(idState);
+		
+		if(state.isEmpty()) return ResponseEntity.notFound().build();
+		
+		stateService.delete(state.get());
+		return ResponseEntity.noContent().build();
 	}
 }

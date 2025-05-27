@@ -1,5 +1,8 @@
 package com.Thiago_landi.sistemas.vendas.service;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.sistemas.vendas.model.State;
@@ -15,5 +18,13 @@ public class StateService {
 	
 	public State save(State state) {
 		return stateRepository.save(state);
+	}
+	
+	public Optional<State> findById(UUID id) {
+		return stateRepository.findById(id);
+	}
+	
+	public void delete(State state) {
+		stateRepository.delete(state);
 	}
 }
