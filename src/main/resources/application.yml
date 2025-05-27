@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: sistemas.vendas
+  datasource:
+    url: jdbc:postgresql://localhost:5434/loja
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+     show-sql: true
+     hibernate:
+       ddl-auto: update
+server:
+    port: 8081
