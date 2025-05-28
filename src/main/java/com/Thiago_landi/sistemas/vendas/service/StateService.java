@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
+import com.Thiago_landi.sistemas.vendas.controller.mappers.StateMapper;
 import com.Thiago_landi.sistemas.vendas.model.State;
 import com.Thiago_landi.sistemas.vendas.repository.StateRepository;
+import com.Thiago_landi.sistemas.vendas.validator.StateValidator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +18,11 @@ import lombok.RequiredArgsConstructor;
 public class StateService {
 
 	private final StateRepository stateRepository;
-	
+	private final StateValidator validator;
+	private final StateMapper mapper;
+		
 	public State save(State state) {
+		validator.validate(state);
 		return stateRepository.save(state);
 	}
 	
@@ -32,6 +37,9 @@ public class StateService {
 	public void update(UUID id, StateDTO dto) {
 		State model = stateRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("O estado com o ID fornecido não existe no banco."));
+		
+		State stateTemp = mapper.toEntity(dto);
+		validator.validate(stateTemp);
 		
 		updateData(model, dto);
 		stateRepository.save(model);
