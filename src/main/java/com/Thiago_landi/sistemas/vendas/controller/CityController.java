@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,6 +74,18 @@ public class CityController implements GenericController{
 		if(cityOptional.isEmpty()) return ResponseEntity.notFound().build();
 		
 		cityService.delete(cityOptional.get());
+		return ResponseEntity.noContent().build();
+	}
+	
+	@PatchMapping("{id}")
+	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody CityDTO dto){
+		var idCity = UUID.fromString(id);
+		
+		if(cityService.findById(idCity).isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		cityService.update(idCity, dto);
 		return ResponseEntity.noContent().build();
 	}
 	
