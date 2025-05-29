@@ -12,28 +12,42 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.ErrorField;
 import com.Thiago_landi.sistemas.vendas.controller.dto.ErrorResponse;
+import com.Thiago_landi.sistemas.vendas.exceptions.InvalidOperationException;
+import com.Thiago_landi.sistemas.vendas.exceptions.RegistryDuplicateException;
 
-@RestControllerAdvice
+@RestControllerAdvice //intercepte automaticamente qualquer exceção lançada por controladores (@RestController)
 public class GlobalExceptionHandler {
 	
 	//captura o @Valid
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
 	public ErrorResponse handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-		List<FieldError> fieldErrors = e.getFieldErrors();	
+		List<FieldError> fieldErrors = e.getFieldErrors();
 		List<ErrorField> listErrors = fieldErrors.stream()
-				.collect(Collectors.toMap(
-				        FieldError::getField,
-				        FieldError::getDefaultMessage,
-				        (existing, replacement) -> existing // mantém a primeira mensagem
-				    ))
-				    .entrySet().stream()
-				    .map(entry -> new ErrorField(entry.getKey(), entry.getValue()))
-				    .collect(Collectors.toList());
-		
-		return new ErrorResponse(
-				 HttpStatus.UNPROCESSABLE_ENTITY.value(),
-				 "Erro de Validação", 
-				 listErrors);
+				.map(fe -> new ErrorField(fe.getField(), fe.getDefaultMessage()))
+				.collect(Collectors.toList());
+		return new ErrorResponse(HttpStatus.UNPROCESSABLE_ENTITY.value(), 
+				"erro de validação", 
+				listErrors);
+	}
+	
+	@ExceptionHandler(RegistryDuplicateException.class)
+	@ResponseStatus(HttpStatus.CONFLICT)
+	public ErrorResponse handlerRegistryDuplicateException(RegistryDuplicateException e) {
+		return ErrorResponse.conflict(e.getMessage());
+	}
+	
+	@ExceptionHandler(InvalidOperationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public ErrorResponse handlerInvalidOperationException(InvalidOperationException e) {
+		return ErrorResponse.responseDefault(e.getMessage());
+	}
+	
+	@ExceptionHandler(RuntimeException.class)
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	public ErrorResponse handlerUnhandledErrors(RuntimeException e) {
+		return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
+				"Ocorreu um erro inesperado. Entre em contato com a administração", 
+				List.of());
 	}
 }
