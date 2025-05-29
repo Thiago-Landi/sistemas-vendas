@@ -7,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
 import com.Thiago_landi.sistemas.vendas.controller.mappers.StateMapper;
+import com.Thiago_landi.sistemas.vendas.exceptions.InvalidOperationException;
 import com.Thiago_landi.sistemas.vendas.model.State;
+import com.Thiago_landi.sistemas.vendas.repository.CityRepository;
 import com.Thiago_landi.sistemas.vendas.repository.StateRepository;
 import com.Thiago_landi.sistemas.vendas.validator.StateValidator;
 
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 public class StateService {
 
 	private final StateRepository stateRepository;
+	private final CityRepository cityRepository;
 	private final StateValidator validator;
 	private final StateMapper mapper;
 		
@@ -30,7 +33,12 @@ public class StateService {
 		return stateRepository.findById(id);
 	}
 	
-	public void delete(State state) {
+	public void delete(State state) {		 
+		 if (cityRepository.existsByState(state)) {
+		        throw new InvalidOperationException(
+		        		"Não é possível excluir um estado que possui cidades associadas.");
+		    }
+		 
 		stateRepository.delete(state);
 	}
 	

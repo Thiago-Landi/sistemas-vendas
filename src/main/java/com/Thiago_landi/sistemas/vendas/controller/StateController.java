@@ -18,6 +18,7 @@ import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
 import com.Thiago_landi.sistemas.vendas.model.State;
 import com.Thiago_landi.sistemas.vendas.service.StateService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,7 +29,7 @@ public class StateController implements GenericController {
 	private final StateService stateService;
 	
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody StateDTO state){
+	public ResponseEntity<Void> save(@RequestBody @Valid StateDTO state){
 		State stateModel = state.mapForState();
 		stateService.save(stateModel);
 		
@@ -63,7 +64,7 @@ public class StateController implements GenericController {
 	}
 	
 	@PatchMapping("{id}")
-	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody StateDTO dto){
+	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid StateDTO dto){
 		var idState = UUID.fromString(id);
 		
 		if(stateService.findById(idState).isEmpty()) {
