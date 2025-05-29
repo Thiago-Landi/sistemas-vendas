@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
+import com.Thiago_landi.sistemas.vendas.controller.mappers.StateMapper;
 import com.Thiago_landi.sistemas.vendas.model.State;
 import com.Thiago_landi.sistemas.vendas.service.StateService;
 
@@ -27,10 +28,11 @@ import lombok.RequiredArgsConstructor;
 public class StateController implements GenericController {
 
 	private final StateService stateService;
+	private final StateMapper mapper;
 	
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody @Valid StateDTO state){
-		State stateModel = state.mapForState();
+	public ResponseEntity<Void> save(@RequestBody @Valid StateDTO dto){
+		State stateModel = mapper.toEntity(dto);
 		stateService.save(stateModel);
 		
 		// esse codigo constroi a url para acessar o author criado (URL:http://localhost:8080/authors/{id})
@@ -41,15 +43,13 @@ public class StateController implements GenericController {
 	@GetMapping("{id}")
 	public ResponseEntity<StateDTO> findById(@PathVariable("id") String id){
 		var idState = UUID.fromString(id);
-		Optional<State> stateOptional = stateService.findById(idState);
-		if(stateOptional.isPresent()) {
-			State state = stateOptional.get();
-			StateDTO stateDto = new StateDTO(state.getName(), state.getAbbreviation());
-			
-			return ResponseEntity.ok(stateDto);
-		}
-		
-		return ResponseEntity.notFound().build();
+
+		return stateService
+				.findById(idState)
+				.map(state -> { 
+					StateDTO dto = mapper.toDTO(state);
+					return ResponseEntity.ok(dto);
+				}).orElseGet( () -> ResponseEntity.notFound().build() );
 	}
 	
 	@DeleteMapping("{id}")
