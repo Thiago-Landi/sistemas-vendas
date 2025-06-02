@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.Thiago_landi.sistemas.vendas.controller.dto.CityDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.CityUpdateDTO;
 import com.Thiago_landi.sistemas.vendas.controller.mappers.CityMapper;
 import com.Thiago_landi.sistemas.vendas.model.City;
 import com.Thiago_landi.sistemas.vendas.repository.CityRepository;
@@ -34,7 +34,7 @@ public class CityService {
 		cityRepository.delete(city);
 	}
 	
-	public void update(UUID id, CityDTO dto) {
+	public void update(UUID id, CityUpdateDTO dto) {
 		City model = cityRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("A cidade com o ID fornecido não existe no banco."));
 		
@@ -45,7 +45,7 @@ public class CityService {
 		cityRepository.save(model);
 	}
 	
-	private void updateData(City model, CityDTO dto) {
+	private void updateData(City model, CityUpdateDTO dto) {
 	    if (dto.name() != null) {
 	        model.setName(dto.name());
 	    }

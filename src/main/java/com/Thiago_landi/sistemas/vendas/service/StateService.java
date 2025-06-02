@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Service;
 
-import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.StateUpdateDTO;
 import com.Thiago_landi.sistemas.vendas.controller.mappers.StateMapper;
 import com.Thiago_landi.sistemas.vendas.exceptions.InvalidOperationException;
 import com.Thiago_landi.sistemas.vendas.model.State;
@@ -42,7 +42,7 @@ public class StateService {
 		stateRepository.delete(state);
 	}
 	
-	public void update(UUID id, StateDTO dto) {
+	public void update(UUID id, StateUpdateDTO dto) {
 		State model = stateRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("O estado com o ID fornecido não existe no banco."));
 		
@@ -53,7 +53,7 @@ public class StateService {
 		stateRepository.save(model);
 	}
 	
-	private void updateData(State model, StateDTO dto) {
+	private void updateData(State model, StateUpdateDTO dto) {
 		if (dto.name() != null) {
 	        model.setName(dto.name());
 	    }

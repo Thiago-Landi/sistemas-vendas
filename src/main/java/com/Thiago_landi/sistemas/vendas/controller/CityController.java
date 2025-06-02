@@ -16,7 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.Thiago_landi.sistemas.vendas.controller.dto.CityDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.CityCreatedDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.CityUpdateDTO;
 import com.Thiago_landi.sistemas.vendas.controller.mappers.CityMapper;
 import com.Thiago_landi.sistemas.vendas.model.City;
 import com.Thiago_landi.sistemas.vendas.model.State;
@@ -36,7 +37,7 @@ public class CityController implements GenericController{
 	private final CityMapper mapper;
 	
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody @Valid CityDTO dto){
+	public ResponseEntity<Void> save(@RequestBody @Valid CityCreatedDTO dto){
 		//verificação se existe o state
 		var idState = dto.state().getId();
 		Optional<State> stateOptional = stateService.findById(idState);
@@ -55,13 +56,13 @@ public class CityController implements GenericController{
 	}
 	
 	@GetMapping("{id}")
-	public ResponseEntity<CityDTO> findById(@PathVariable("id") String id){
+	public ResponseEntity<CityCreatedDTO> findById(@PathVariable("id") String id){
 		var idCity = UUID.fromString(id);
 		
 		return cityService
 					.findById(idCity)
 					.map(city -> {
-						CityDTO dto = mapper.toDTO(city);
+						CityCreatedDTO dto = mapper.toCreateDTO(city);
 						return ResponseEntity.ok(dto);
 					}).orElseGet( () -> ResponseEntity.notFound().build());
 	}
@@ -78,7 +79,7 @@ public class CityController implements GenericController{
 	}
 	
 	@PatchMapping("{id}")
-	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid CityDTO dto){
+	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid CityUpdateDTO dto){
 		var idCity = UUID.fromString(id);
 		
 		if(cityService.findById(idCity).isEmpty()) {

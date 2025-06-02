@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.Thiago_landi.sistemas.vendas.controller.dto.StateDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.StateCreatedDTO;
+import com.Thiago_landi.sistemas.vendas.controller.dto.StateUpdateDTO;
 import com.Thiago_landi.sistemas.vendas.controller.mappers.StateMapper;
 import com.Thiago_landi.sistemas.vendas.model.State;
 import com.Thiago_landi.sistemas.vendas.service.StateService;
@@ -31,7 +32,7 @@ public class StateController implements GenericController {
 	private final StateMapper mapper;
 	
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody @Valid StateDTO dto){
+	public ResponseEntity<Void> save(@RequestBody @Valid StateCreatedDTO dto){
 		State stateModel = mapper.toEntity(dto);
 		stateService.save(stateModel);
 		
@@ -41,13 +42,13 @@ public class StateController implements GenericController {
 	}
 	
 	@GetMapping("{id}")
-	public ResponseEntity<StateDTO> findById(@PathVariable("id") String id){
+	public ResponseEntity<StateCreatedDTO> findById(@PathVariable("id") String id){
 		var idState = UUID.fromString(id);
 
 		return stateService
 				.findById(idState)
 				.map(state -> { 
-					StateDTO dto = mapper.toDTO(state);
+					StateCreatedDTO dto = mapper.toCreateDTO(state);
 					return ResponseEntity.ok(dto);
 				}).orElseGet( () -> ResponseEntity.notFound().build() );
 	}
@@ -64,7 +65,7 @@ public class StateController implements GenericController {
 	}
 	
 	@PatchMapping("{id}")
-	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid StateDTO dto){
+	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid StateUpdateDTO dto){
 		var idState = UUID.fromString(id);
 		
 		if(stateService.findById(idState).isEmpty()) {
