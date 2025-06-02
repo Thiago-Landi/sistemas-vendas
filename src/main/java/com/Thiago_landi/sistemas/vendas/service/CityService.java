@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.CityDTO;
+import com.Thiago_landi.sistemas.vendas.controller.mappers.CityMapper;
 import com.Thiago_landi.sistemas.vendas.model.City;
 import com.Thiago_landi.sistemas.vendas.repository.CityRepository;
+import com.Thiago_landi.sistemas.vendas.validator.CityValidator;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,8 +18,11 @@ import lombok.RequiredArgsConstructor;
 public class CityService {
 
 	private final CityRepository cityRepository;
+	private final CityMapper mapper;
+	private final CityValidator validator;
 	
 	public City save(City city) {
+		validator.validate(city);
 		return cityRepository.save(city);
 	}
 	
@@ -32,6 +37,9 @@ public class CityService {
 	public void update(UUID id, CityDTO dto) {
 		City model = cityRepository.findById(id)
 				.orElseThrow(() -> new IllegalArgumentException("A cidade com o ID fornecido não existe no banco."));
+		
+		City cityTemp = mapper.toEntity(dto);
+		validator.validate(cityTemp);
 		
 		updateData(model, dto);
 		cityRepository.save(model);

@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.CityDTO;
+import com.Thiago_landi.sistemas.vendas.controller.mappers.CityMapper;
 import com.Thiago_landi.sistemas.vendas.model.City;
 import com.Thiago_landi.sistemas.vendas.model.State;
 import com.Thiago_landi.sistemas.vendas.service.CityService;
 import com.Thiago_landi.sistemas.vendas.service.StateService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -31,11 +33,12 @@ public class CityController implements GenericController{
 
 	private final CityService cityService;
 	private final StateService stateService;
+	private final CityMapper mapper;
 	
 	@PostMapping
-	public ResponseEntity<Void> save(@RequestBody CityDTO city){
+	public ResponseEntity<Void> save(@RequestBody @Valid CityDTO dto){
 		//verificação se existe o state
-		var idState = city.state().getId();
+		var idState = dto.state().getId();
 		Optional<State> stateOptional = stateService.findById(idState);
 		
 		if(stateOptional.isEmpty()) {
@@ -44,7 +47,7 @@ public class CityController implements GenericController{
 		
 		//salvando city 
 		
-		City cityModel = city.mapForCity();
+		City cityModel = mapper.toEntity(dto);
 		cityService.save(cityModel);
 		
 		URI location = generateHeaderLocation(cityModel.getId());
@@ -54,16 +57,13 @@ public class CityController implements GenericController{
 	@GetMapping("{id}")
 	public ResponseEntity<CityDTO> findById(@PathVariable("id") String id){
 		var idCity = UUID.fromString(id);
-		Optional<City> cityOptional = cityService.findById(idCity);
 		
-		if(cityOptional.isPresent()) {
-			City cityModel = cityOptional.get();
-			CityDTO cityDto = new CityDTO(cityModel.getName(), cityModel.getCep(), cityModel.getState());
-			
-			return ResponseEntity.ok(cityDto);
-		}
-		
-		return ResponseEntity.notFound().build();
+		return cityService
+					.findById(idCity)
+					.map(city -> {
+						CityDTO dto = mapper.toDTO(city);
+						return ResponseEntity.ok(dto);
+					}).orElseGet( () -> ResponseEntity.notFound().build());
 	}
 	
 	@DeleteMapping("{id}")
@@ -78,7 +78,7 @@ public class CityController implements GenericController{
 	}
 	
 	@PatchMapping("{id}")
-	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody CityDTO dto){
+	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid CityDTO dto){
 		var idCity = UUID.fromString(id);
 		
 		if(cityService.findById(idCity).isEmpty()) {

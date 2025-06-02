@@ -16,12 +16,12 @@ public class StateValidator {
 	private StateRepository repository;
 	
 	public void validate(State state) {
-		if(thereRegisteredAuthor(state)) {
+		if(thereRegisteredState(state)) {
 			throw new RegistryDuplicateException("estado já cadastrado");
 		}
 	}
 	
-	private boolean thereRegisteredAuthor(State state) {
+	private boolean thereRegisteredState(State state) {
 		Optional<State> stateOptional = repository.findByNameAndAbbreviation(
 				state.getName(), state.getAbbreviation());
 		
