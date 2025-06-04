@@ -8,4 +8,6 @@ import com.Thiago_landi.sistemas.vendas.model.UserClass;
 
 public interface UserClassRepository extends JpaRepository<UserClass, UUID> {
 
+	UserClass findByLogin(String login);
+
 }

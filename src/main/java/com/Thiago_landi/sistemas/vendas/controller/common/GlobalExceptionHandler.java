@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.ErrorField;
 import com.Thiago_landi.sistemas.vendas.controller.dto.ErrorResponse;
+import com.Thiago_landi.sistemas.vendas.exceptions.InvalidJwtAuthenticationException;
 import com.Thiago_landi.sistemas.vendas.exceptions.InvalidOperationException;
 import com.Thiago_landi.sistemas.vendas.exceptions.RegistryDuplicateException;
 
@@ -49,5 +50,15 @@ public class GlobalExceptionHandler {
 		return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), 
 				"Ocorreu um erro inesperado. Entre em contato com a administração", 
 				List.of());
+	}
+	
+	@ExceptionHandler(InvalidJwtAuthenticationException.class)
+	@ResponseStatus(HttpStatus.FORBIDDEN)
+	public ErrorResponse handlerInvalidJwtAuthenticationException(InvalidJwtAuthenticationException e) {
+	    return new ErrorResponse(
+	        HttpStatus.FORBIDDEN.value(),
+	        e.getMessage(),
+	        List.of()
+	    );
 	}
 }

@@ -34,7 +34,7 @@ public class UserClass implements UserDetails {
 	@GeneratedValue(strategy = GenerationType.UUID)
 	private UUID id;
 	
-	@Column
+	@Column(unique = true)
     private String login;
 	
 	@Column
