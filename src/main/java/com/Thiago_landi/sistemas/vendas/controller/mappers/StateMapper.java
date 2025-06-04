@@ -4,7 +4,6 @@ import org.mapstruct.Mapper;
 
 import com.Thiago_landi.sistemas.vendas.controller.dto.StateCreatedDTO;
 import com.Thiago_landi.sistemas.vendas.controller.dto.StateUpdateDTO;
-import com.Thiago_landi.sistemas.vendas.model.City;
 import com.Thiago_landi.sistemas.vendas.model.State;
 
 @Mapper(componentModel = "spring")
