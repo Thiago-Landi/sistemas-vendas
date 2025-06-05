@@ -12,3 +12,8 @@ spring:
        ddl-auto: update
 server:
     port: 8081
+security:
+  jwt:
+    token:
+      secret-key: ${JWT_SECRET}
+      expire-lenght: 3600000

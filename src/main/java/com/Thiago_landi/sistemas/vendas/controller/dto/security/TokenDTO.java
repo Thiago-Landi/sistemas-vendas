@@ -4,7 +4,7 @@ import java.util.Date;
 
 
 public record TokenDTO (
-		String username, 
+		String Login, 
 		Boolean authenticated, 
 		Date created, 
 		Date expiration, 
