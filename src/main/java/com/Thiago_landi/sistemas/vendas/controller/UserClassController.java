@@ -26,7 +26,7 @@ public class UserClassController implements GenericController {
 	@PostMapping
 	public ResponseEntity<Void> save(@RequestBody UserClassDTO dto){
 		UserClass userModel = mapper.toEntity(dto);
-		userClassService.save(userModel);
+		userClassService.save(userModel, dto.permissions());
 		
 		URI location = generateHeaderLocation(userModel.getId());
 		return ResponseEntity.created(location).build();
