@@ -50,11 +50,32 @@ public class JwtTokenProvider {
 		String refreshToken = getRefreshToken(login, roles, now);
 		return new TokenDTO(login, true, now, validity, acessToken, refreshToken);
     }
+    
+    public TokenDTO refreshToken(String login, String refreshToken) {
+        String token = refreshToken.startsWith("Bearer ") ? 
+                       refreshToken.substring("Bearer ".length()) : 
+                       refreshToken;
+
+        DecodedJWT jwt = JWT.require(algorithm).build().verify(token);
+
+        if (!"refresh".equals(jwt.getClaim("type").asString())) {
+            throw new InvalidJwtAuthenticationException("Token is not a refresh token!");
+        }
+
+        if (!jwt.getSubject().equals(login)) {
+            throw new InvalidJwtAuthenticationException("Token does not match the user.");
+        }
+
+        List<String> roles = jwt.getClaim("roles").asList(String.class);
+        return createAccessToken(login, roles);
+    }
+
 
 	private String getRefreshToken(String login, List<String> roles, Date now) {
 		Date refreshTokenValidity = new Date(now.getTime() + (validityInMilliseconds * 3));
 		return JWT.create()
 				.withClaim("roles", roles)
+			    .withClaim("type", "refresh")
 				.withIssuedAt(now)
 				.withExpiresAt(refreshTokenValidity)
 				.withSubject(login)
@@ -66,7 +87,7 @@ public class JwtTokenProvider {
         String issuerUrl = ServletUriComponentsBuilder.fromCurrentContextPath().build().toUriString();
         return JWT.create()
         		.withClaim("roles", roles)
-                .withIssuedAt(now)
+        		.withIssuedAt(now)
                 .withExpiresAt(validity)
                 .withSubject(login)
                 .withIssuer(issuerUrl)
@@ -90,11 +111,12 @@ public class JwtTokenProvider {
 	public String resolveToken(HttpServletRequest request) {
 		String bearerToken = request.getHeader("Authorization");
 		
-		if(bearerToken != null && !bearerToken.trim().isEmpty() && bearerToken.startsWith("Bearer ")) {
-			return bearerToken.substring("Bearer ".length());
-		} 
-		
+		if(refreshTokenContainsBearer(bearerToken)) return bearerToken.substring("Bearer ".length()); 	
 		return null;
+	}
+	
+	private static boolean refreshTokenContainsBearer(String refreshToken) {
+		return refreshToken != null && !refreshToken.trim().isEmpty() && refreshToken.startsWith("Bearer ");
 	}
 	
 	public boolean validateToken(String token) {

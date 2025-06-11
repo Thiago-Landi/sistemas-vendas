@@ -32,4 +32,15 @@ public class AuthService {
 		return token;
 	}
 	
+	public TokenDTO refreshToken(String login, String refreshToken) {
+		var user = userRepository.findByLogin(login);
+		TokenDTO token;
+		if(user != null) {
+			token = tokenProvider.refreshToken(login, refreshToken);
+		}else {
+            throw new UsernameNotFoundException("Login " + login + " not found!");
+		}
+		return token;
+	}
+	
 }
