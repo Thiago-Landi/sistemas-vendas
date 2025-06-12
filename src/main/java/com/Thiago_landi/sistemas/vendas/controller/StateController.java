@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -32,6 +33,7 @@ public class StateController implements GenericController {
 	private final StateMapper mapper;
 	
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> save(@RequestBody @Valid StateCreatedDTO dto){
 		State stateModel = mapper.toEntity(dto);
 		stateService.save(stateModel);
@@ -42,6 +44,7 @@ public class StateController implements GenericController {
 	}
 	
 	@GetMapping("{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
 	public ResponseEntity<StateCreatedDTO> findById(@PathVariable("id") String id){
 		var idState = UUID.fromString(id);
 
@@ -54,6 +57,7 @@ public class StateController implements GenericController {
 	}
 	
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> delete(@PathVariable("id") String id){
 		var idState = UUID.fromString(id);
 		Optional<State> state = stateService.findById(idState);
@@ -65,6 +69,7 @@ public class StateController implements GenericController {
 	}
 	
 	@PatchMapping("{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid StateUpdateDTO dto){
 		var idState = UUID.fromString(id);
 		

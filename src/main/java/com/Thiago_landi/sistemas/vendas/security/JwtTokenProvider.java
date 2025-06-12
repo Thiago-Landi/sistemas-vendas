@@ -7,7 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -96,9 +96,15 @@ public class JwtTokenProvider {
 	
 	public Authentication getAuthentication(String token) {
 		DecodedJWT decodedJWT = decodeToken(token);
-		UserDetails userDetails = this.userDetailsService
-				.loadUserByUsername(decodedJWT.getSubject());
-		return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities()); 
+		List<String> roles = decodedJWT.getClaim("roles").asList(String.class);
+
+		List<SimpleGrantedAuthority> authorities = roles.stream()
+		        .map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role) // garante prefixo
+		        .map(SimpleGrantedAuthority::new)
+		        .toList();
+
+		return new UsernamePasswordAuthenticationToken(decodedJWT.getSubject(), "", authorities);
+
 	}
 
 	private DecodedJWT decodeToken(String token) {

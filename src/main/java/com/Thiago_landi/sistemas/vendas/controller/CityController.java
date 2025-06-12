@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,6 +38,7 @@ public class CityController implements GenericController{
 	private final CityMapper mapper;
 	
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> save(@RequestBody @Valid CityCreatedDTO dto){
 		//verificação se existe o state
 		var idState = dto.state().getId();
@@ -56,6 +58,7 @@ public class CityController implements GenericController{
 	}
 	
 	@GetMapping("{id}")
+	@PreAuthorize("hasAnyRole('ADMIN', 'OPERADOR')")
 	public ResponseEntity<CityCreatedDTO> findById(@PathVariable("id") String id){
 		var idCity = UUID.fromString(id);
 		
@@ -68,6 +71,7 @@ public class CityController implements GenericController{
 	}
 	
 	@DeleteMapping("{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> delete(@PathVariable("id") String id){
 		var idCity = UUID.fromString(id);
 		Optional<City> cityOptional = cityService.findById(idCity);
@@ -79,6 +83,7 @@ public class CityController implements GenericController{
 	}
 	
 	@PatchMapping("{id}")
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody @Valid CityUpdateDTO dto){
 		var idCity = UUID.fromString(id);
 		
